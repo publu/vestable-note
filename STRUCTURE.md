@@ -1,5 +1,7 @@
 # Structural Analysis: Liquidity, Transferability, and Pendle
 
+> **Read HELD-TO-MATURITY.md first.** The canonical protocol stance is that locks are non-transferable, no Pendle integration is supported, and no Yearn-style aggregator is endorsed. The analysis below explores the alternative paths for completeness (transferable NFT, external aggregator wrap, Pendle PT/YT layer) but they describe what the protocol declines to enable, not what it does. The point of mapping them is to be precise about which fragility the design refuses to import.
+
 This document examines the veStable as a market-design object. Where the liquidity actually sits, what the locked position looks like to secondary markets, how it interacts with Pendle and the rest of the DeFi stack, and what fails under stress.
 
 ## Three Liquidity States
