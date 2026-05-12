@@ -89,6 +89,33 @@ Under this rule, the two signals stop being two separate dials. Lock duration di
 
 If the protocol cannot find a deal matching your duration, your capital sits in liquid backing and earns base yield only. That is the honest answer to "why am I locked but not earning premium": there is no deal at your duration yet.
 
+## The Contingent Lock
+
+The signal `min(duration, utilization)` implies something stronger than a fixed-term lock. The lock is binding only on the portion of the position the protocol actually deployed into the illiquid leg. The undeployed portion stays liquid even when the user has signed a long lock commitment.
+
+```text
+deployed_i  = sum(backing_i.illiquid)        <- locked, illiquid
+liquid_i    = amount_i - deployed_i           <- withdrawable on demand
+```
+
+A user who locks 100 USD for one year, when the protocol routes 60 USD into a 9-month catalog deal and parks 40 USD in T-bills, is locked on exactly 60 USD. The other 40 USD is a stablecoin sitting in a money-market vault that happens to live inside the protocol. They can pull it any time.
+
+This closes the worst asymmetry of a Curve-style hard lock: "you committed, the protocol did not deploy, you eat the illiquidity anyway." Under the contingent lock, illiquidity follows deployment. No deployment, no illiquidity.
+
+## The Zero-Utilization Steady State
+
+When the protocol has no illiquid deployments at all:
+
+- Every user's `utilization_i = 0`
+- `effective_weight_i = 0` for everyone
+- `premium_yield_pool` has no inflows because no illiquid asset is producing yield
+- Everyone earns base yield only, distributed pro-rata across `locked_amount`
+- Locked positions and unlocked face are functionally identical: same yield, no enforceable lock
+
+In that state the veStable looks structurally identical to plain sUSDS or USDC-in-Morpho. Flat curve. No effective lock. The whole duration apparatus is dormant.
+
+This is intended. The duration mechanism only switches on when there is something for it to govern. The mechanism does not impose costs in the absence of asset-side deployment, and it cannot quietly tax depositors during a period of low protocol activity. The user-facing rule is symmetric: no work from the protocol means no commitment from the depositor.
+
 ## What This Replaces
 
 The single-token shape collapses four mechanisms that protocols usually bolt on separately:
